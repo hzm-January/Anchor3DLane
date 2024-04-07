@@ -65,35 +65,35 @@ class LoadImageFromFile(object):
         else:
             filename = results['img_info']['filename']
         img_bytes = self.file_client.get(filename)
-        img = mmcv.imfrombytes(
+        img = mmcv.imfrombytes( # img (1280,1920,3)
             img_bytes, flag=self.color_type, backend=self.imdecode_backend)
-        if self.to_float32:
+        if self.to_float32: # False
             img = img.astype(np.float32)
 
         results['filename'] = filename
         results['ori_filename'] = results['img_info']['filename']
         results['img'] = img
-        results['img_shape'] = img.shape
-        results['ori_shape'] = img.shape
+        results['img_shape'] = img.shape # img (1280,1920,3)
+        results['ori_shape'] = img.shape # img (1280,1920,3)
         # Set initial values for default meta_keys
-        results['pad_shape'] = img.shape
+        results['pad_shape'] = img.shape # img (1280,1920,3)
         results['scale_factor'] = 1.0
-        num_channels = 1 if len(img.shape) < 3 else img.shape[2]
+        num_channels = 1 if len(img.shape) < 3 else img.shape[2] # num_channels 3
         results['img_norm_cfg'] = dict(
             mean=np.zeros(num_channels, dtype=np.float32),
             std=np.ones(num_channels, dtype=np.float32),
             to_rgb=False)
-        if self.extra_keys is not None:
+        if self.extra_keys is not None: # extra_keys 'prev_images'
             imgs = []
-            for filename in results[self.extra_keys]:
+            for filename in results[self.extra_keys]: # 'prev_images'=list len=1 [path]
                 img_bytes = self.file_client.get(filename)
                 img = mmcv.imfrombytes(
                     img_bytes, flag=self.color_type, backend=self.imdecode_backend)
                 if self.to_float32:
                     img = img.astype(np.float32)
-                imgs.append(img)
-            results['img'] = np.stack([results['img']]+imgs, axis=-1)
-        return results
+                imgs.append(img) # img (1280,1920,3)
+            results['img'] = np.stack([results['img']]+imgs, axis=-1) # [results['img']] list len=1 [(1280,1920,3)] imgs list len=1 [(1280,1920,3)]
+        return results # results['img'] (1280,1920,3,2)
 
     def __repr__(self):
         repr_str = self.__class__.__name__

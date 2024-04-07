@@ -1,5 +1,7 @@
 import os
 import json
+import sys
+sys.path.append('/root/autodl-tmp/code/anchor3d/') # 添加模块搜索路径
 import re
 import cv2
 from mmseg.datasets.tools.utils import *

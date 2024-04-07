@@ -70,13 +70,13 @@ class OpenlaneMFDataset(OpenlaneDataset):
         print("found {} samples in total".format(len(self.img_infos)))
 
     def sample_prev_frame_train(self, prev_datas, cur_project_matrix, cur_filename):
-        if len(prev_datas['prev_data']) < self.prev_range:
+        if len(prev_datas['prev_data']) < self.prev_range: # prev_range 5
             ori_len = len(prev_datas['prev_data'])
             for i in range(ori_len, self.prev_range):
                 prev_datas['prev_data'].append({'file_path':cur_filename, 'project_matrix':cur_project_matrix.copy()})
-        select_prev_datas = np.random.choice(prev_datas['prev_data'][-self.prev_range:], self.prev_num, replace=False)
-        prev_images = [os.path.join(self.data_root, p['file_path']) for p in select_prev_datas]
-        prev_poses = [p['project_matrix'].copy() for p in select_prev_datas]
+        select_prev_datas = np.random.choice(prev_datas['prev_data'][-self.prev_range:], self.prev_num, replace=False) # prev_num 1 从前5帧中随机抽一帧
+        prev_images = [os.path.join(self.data_root, p['file_path']) for p in select_prev_datas] # select_prev_datas ndarray(1,) [prev_data{file_path,project_matrix,pose}]
+        prev_poses = [p['project_matrix'].copy() for p in select_prev_datas] # prev_images list len=1 [prev_images_file_path] prev_poses list len=1 [ndarray(3,4)]
         return prev_images, prev_poses
 
     def sample_prev_frame_test(self, prev_datas, cur_project_matrix, cur_filename):
@@ -107,7 +107,7 @@ class OpenlaneMFDataset(OpenlaneDataset):
         post_poses = [p['project_matrix'].copy() for p in post_datas['post_data'][self.prev_step-1:self.prev_num*self.prev_step:self.prev_step]]  
         return post_images, post_poses
 
-    def __getitem__(self, idx, transform=False):
+    def __getitem__(self, idx, transform=False): # idx 77898
         """Get training/test data after pipeline.
 
         Args:
@@ -117,8 +117,8 @@ class OpenlaneMFDataset(OpenlaneDataset):
             dict: Training/test data (with annotation if `test_mode` is set
                 False).
         """
-        results = self.img_infos[idx].copy()
-        results['img_info'] = {}
+        results = self.img_infos[idx].copy() # img_infos[138264]
+        results['img_info'] = {} # {'filename': './data/OpenLane/images/training/segment-14818835630668820137_1780_000_1800_000_with_camera_labels/155848393712244900.jpg', 'anno_file': './data/OpenLane/cache_dense/training/segment-14818835630668820137_1780_000_1800_000_with_camera_labels/155848393712244900.pkl', 'prev_file': './data/OpenLane/prev_data_release/training/segment-14818835630668820137_1780_000_1800_000_with_camera_labels/155848393712244900.pkl'}
         results['img_info']['filename'] = results['filename']
         results['ori_filename'] = results['filename']
         results['ori_shape'] = (self.h_org, self.w_org)
@@ -126,13 +126,13 @@ class OpenlaneMFDataset(OpenlaneDataset):
         results['flip_direction'] = None
         with open(results['anno_file'], 'rb') as f:
             obj = pickle.load(f)
-            results.update(obj)
+            results.update(obj) # obj{'image_id':path,'gt_3dlanes(20,605)','gt_camera_extrinsic'(4,4),'gt_camera_intrinsic'(3,3)}
         if self.no_cls:
             results['gt_3dlanes'][:, 1] = results['gt_3dlanes'][:, 1] > 0
         results['img_metas'] = {'ori_shape':results['ori_shape']}
         results['gt_project_matrix'] = projection_g2im_extrinsic(results['gt_camera_extrinsic'], results['gt_camera_intrinsic'])
         results['gt_homography_matrix'] = homography_g2im_extrinsic(results['gt_camera_extrinsic'], results['gt_camera_intrinsic'])
-        with open(results['prev_file'], 'rb') as f:
+        with open(results['prev_file'], 'rb') as f: # prev_datas {pose, prev_data{file_path,project_matrix,pose}}
             prev_datas = pickle.load(f)
         
         if self.test_mode:
@@ -145,7 +145,7 @@ class OpenlaneMFDataset(OpenlaneDataset):
                 prev_images, prev_poses = self.sample_prev_frame_train(prev_datas, results['gt_project_matrix'], results['filename'])
             else:
                 prev_images, prev_poses = self.sample_post_frame_train(prev_datas, results['gt_project_matrix'], results['filename'])
-        results['prev_images'] = prev_images
-        results['prev_poses'] = prev_poses
+        results['prev_images'] = prev_images # prev_images list len=1 [prev_images_file_path]
+        results['prev_poses'] = prev_poses # prev_poses list len=1 [ndarray(3,4)]
         results = self.pipeline(results)
         return results

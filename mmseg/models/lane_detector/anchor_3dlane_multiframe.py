@@ -78,7 +78,7 @@ class Anchor3DLaneMF(Anchor3DLane):
             sampled_anchor[:, :, 5+self.anchor_feat_len:5+self.anchor_feat_len*2] = proposals_prev[:, :, 5+self.anchor_len:5+self.anchor_len*2][:, :, self.feat_sample_index]
             xs, ys, zs = self.compute_anchor_cut_indices(sampled_anchor, self.feat_y_steps)
             batch_anchor_features_cur, _ = self.cut_anchor_features(anchor_feat[0], project_matrixes, xs, ys, zs)   # [B, C, N, l]
-            for i in range(self.prev_num):
+            for i in range(self.prev_num): # TODO: 如何将anchor points投影到之前的帧
                 prev_anchor_features, _ = self.cut_anchor_features(anchor_feat[i+1], prev_project_matrixes[i], xs, ys, zs)
                 batch_anchor_features_prev.append(prev_anchor_features)  # [B, C, N, l]
 

@@ -238,7 +238,7 @@ def train(model,
         runner.resume(cfg.resume_from)
     elif cfg.load_from:
         runner.load_checkpoint(cfg.load_from)
-    runner.run(data_loaders, cfg.workflow)
+    runner.run(data_loaders, cfg.workflow) # workflow [('train', 10000000)] data_loaders <torch.utils.data.dataloader.DataLoader object at 0x7f6c83c962b0>
 
 def main():
     args = parse_args()

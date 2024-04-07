@@ -443,7 +443,7 @@ class Anchor3DLane(BaseModule):
         Returns:
             dict[str, Tensor]: a dictionary of loss components
         """
-        gt_project_matrix = gt_project_matrix.squeeze(1)
+        gt_project_matrix = gt_project_matrix.squeeze(1) # 这个matrix从哪里来的，是不是对齐需要用的
         output, output_aux = self.encoder_decoder(img, mask, gt_project_matrix, **kwargs)
         losses, other_vars = self.loss(output, gt_3dlanes, output_aux)
         return losses, other_vars
