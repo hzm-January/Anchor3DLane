@@ -69,7 +69,7 @@ class Anchor3DLaneMF(Anchor3DLane):
         batch_anchor_features_prev = []
         if proposals_prev is None:
             batch_anchor_features_cur, _ = self.cut_anchor_features(anchor_feat[0], project_matrixes, self.xs, self.ys, self.zs)   # [B, C, N, l]
-            for i in range(self.prev_num):
+            for i in range(self.prev_num): # prev_num=1
                 prev_anchor_features, _ = self.cut_anchor_features(anchor_feat[i+1], prev_project_matrixes[i], self.xs, self.ys, self.zs)
                 batch_anchor_features_prev.append(prev_anchor_features)  # [B, C, N, l]
         else:

@@ -83,7 +83,7 @@ class LoadImageFromFile(object):
             mean=np.zeros(num_channels, dtype=np.float32),
             std=np.ones(num_channels, dtype=np.float32),
             to_rgb=False)
-        if self.extra_keys is not None: # extra_keys 'prev_images'
+        if self.extra_keys is not None: # extra_keys 'prev_images' 这里要加载前序图片与当前图片堆叠
             imgs = []
             for filename in results[self.extra_keys]: # 'prev_images'=list len=1 [path]
                 img_bytes = self.file_client.get(filename)
@@ -93,7 +93,7 @@ class LoadImageFromFile(object):
                     img = img.astype(np.float32)
                 imgs.append(img) # img (1280,1920,3)
             results['img'] = np.stack([results['img']]+imgs, axis=-1) # [results['img']] list len=1 [(1280,1920,3)] imgs list len=1 [(1280,1920,3)]
-        return results # results['img'] (1280,1920,3,2)
+        return results # results['img'] (1280,1920,3,2) 最后一维是 帧数量， 3是图片维度RGB，前面是图像尺寸
 
     def __repr__(self):
         repr_str = self.__class__.__name__

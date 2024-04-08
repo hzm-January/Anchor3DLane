@@ -1,6 +1,8 @@
 import pdb
 import os
 import numpy as np
+import sys
+sys.path.append('/root/autodl-tmp/code/anchor3d/') # 添加模块搜索路径
 import json
 import pickle
 import cv2
@@ -56,7 +58,7 @@ def warp_one(data_path, pose_path, target_path):
                 prev_pose = np.loadtxt(os.path.join(pose_path, data_list[prev_idx].replace('00.json', '.txt')))
                 prev_path = prev_info['file_path']
                 P_g2im_last = generate_proj_matrix(prev_info, prev_pose, cur_info, cur_pose, cam_extrinsics)
-                prev_data['file_path'] = os.path.join(data_root, 'images', prev_path)
+                prev_data['file_path'] = os.path.join(args.data_root, 'images', prev_path)
                 prev_data['project_matrix'] = P_g2im_last
                 prev_data['pose'] = prev_pose
                 prev_datas.append(prev_data)
@@ -68,7 +70,7 @@ def warp_one(data_path, pose_path, target_path):
                 post_pose = np.loadtxt(os.path.join(pose_path, data_list[post_idx].replace('00.json', '.txt')))
                 post_path = post_info['file_path']
                 P_g2im_last = generate_proj_matrix(post_info, post_pose, cur_info, cur_pose, cam_extrinsics)
-                post_data['file_path'] = os.path.join(data_root, 'images', post_path)
+                post_data['file_path'] = os.path.join(args.data_root, 'images', post_path)
                 post_data['project_matrix'] = P_g2im_last
                 post_data['pose'] = post_pose
                 post_datas.append(post_data)
@@ -91,7 +93,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process Openlane dataset')
     parser.add_argument('data_root', help='root path of openlane dataset')
     args = parser.parse_args()
-    path_lists = glob.glob(os.path.join(data_root, 'lane3d_1000/*/segment-*'))
+    path_lists = glob.glob(os.path.join(args.data_root, 'lane3d_1000/*/segment-*'))
     p = Pool(8)
     interval = len(path_lists) // 8
     for pid in range(8):
@@ -100,6 +102,6 @@ if __name__ == '__main__':
         else:
             cur_list = path_lists[pid * interval:(pid+1)*interval]
         print("add process {}".format(pid))
-        p.apply_async(warp_prev_frames, args=(cur_list, pid))
+        p.apply_async(warp_prev_frames, args=(cur_list,'/root/autodl-tmp/dataset/openlane/frames_bk/pose','/root/autodl-tmp/dataset/openlane/prev_data_release1.2', pid))
     p.close()
     p.join()

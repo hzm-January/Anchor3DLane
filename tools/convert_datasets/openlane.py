@@ -337,9 +337,9 @@ def vis_anno(pickle_path):
         ax3.plot(xs, ys, zs, 'mediumpurple', lw=3)
     plt.savefig('../../output/openlane_test.png')
     
-def merge_annotations(anno_path, json_file):
-    all_files = glob.glob(os.path.join(anno_path, 'seg*', '*.json'))
-    w = open(json_file, 'w')
+def merge_annotations(anno_path, json_file): # 这个函数将所有annotation分train和val写入data_splits/training.json 和validation.json中，两次调用
+    all_files = glob.glob(os.path.join(anno_path, 'seg*', '*.json')) # 读取所有'/root/autodl-tmp/dataset/openlane/lane3d_1000/training/seg....json
+    w = open(json_file, 'w') # '/root/autodl-tmp/dataset/openlane/data_splits/training.json'
     for idx, file_name in enumerate(all_files):
         with open(file_name, 'r') as f:
             s = f.readline()
@@ -364,10 +364,10 @@ if __name__ == '__main__':
         merge_annotations(os.path.join(args.data_root, 'lane3d_1000', 'training'), os.path.join(args.data_root, 'data_splits', 'training.json'))
         merge_annotations(os.path.join(args.data_root, 'lane3d_1000', 'validation'), os.path.join(args.data_root, 'data_splits', 'validation.json'))
     elif args.generate:
-        ori_json = os.path.join(args.data_root, 'data_splits', 'training.json')
-        tar_path = os.path.join(args.data_root, 'cache_dense')
-        data_list_path = os.path.join(args.data_root, 'data_lists')
-        os.makedirs(data_list_path, exist_ok=True)
+        ori_json = os.path.join(args.data_root, 'data_splits', 'training.json') # 'data_splits/training.json'
+        tar_path = os.path.join(args.data_root, 'cache_dense') # 'dataset/openlane/cache_dense'
+        data_list_path = os.path.join(args.data_root, 'data_lists') # '/root/autodl-tmp/dataset/openlane'
+        os.makedirs(data_list_path, exist_ok=True) # '/root/autodl-tmp/dataset/openlane/data_lists'
         extract_data_with_smoothing(args.data_root, ori_json, tar_path=tar_path, test_mode=False)
         generate_datalist(os.path.join(tar_path, 'training'), os.path.join(data_list_path, 'training.txt'))
         ori_json = os.path.join(args.data_root, 'data_splits', 'validation.json')

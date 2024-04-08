@@ -59,25 +59,25 @@ class OpenlaneMFDataset(OpenlaneDataset):
     def load_annotations(self):
         print('Now loading annotations...')
         self.img_infos = []
-        with open(self.data_list, 'r') as anno_obj:
-            all_ids = [s.strip() for s in anno_obj.readlines()]
+        with open(self.data_list, 'r') as anno_obj: # data_list = '/root/autodl-tmp/dataset/openlane/data_lists/training.txt'
+            all_ids = [s.strip() for s in anno_obj.readlines()] # 加载所有的id 'training/segment-1473681173028010305_1780_000_1800_000_with_camera_labels/154752574324774500'
             for k, id in tqdm.tqdm(enumerate(all_ids)):
-                anno = {'filename': os.path.join(self.img_dir, id + self.img_suffix),
-                        'anno_file': os.path.join(self.cache_dir, id + '.pkl'), 
-                        'prev_file': os.path.join(self.prev_dir, id + '.pkl')}
+                anno = {'filename': os.path.join(self.img_dir, id + self.img_suffix), # img_suffix .jpg id= 'training/segment-1473681173028010305_1780_000_1800_000_with_camera_labels/154752574324774500'
+                        'anno_file': os.path.join(self.cache_dir, id + '.pkl'),  # filename = '/root/autodl-tmp/dataset/openlane/images/training/segment-1473681173028010305_1780_000_1800_000_with_camera_labels/154752574324774500.jpg'
+                        'prev_file': os.path.join(self.prev_dir, id + '.pkl')} # '/root/autodl-tmp/dataset/openlane/prev_data_release/training/segment-1473681173028010305_1780_000_1800_000_with_camera_labels/154752574324774500.pkl'
                 self.img_infos.append(anno)
         print("after load annotation")
         print("found {} samples in total".format(len(self.img_infos)))
 
     def sample_prev_frame_train(self, prev_datas, cur_project_matrix, cur_filename):
-        if len(prev_datas['prev_data']) < self.prev_range: # prev_range 5
+        if len(prev_datas['prev_data']) < self.prev_range: # 前序帧数量小于 prev_range 5 用当前帧补齐5？
             ori_len = len(prev_datas['prev_data'])
             for i in range(ori_len, self.prev_range):
                 prev_datas['prev_data'].append({'file_path':cur_filename, 'project_matrix':cur_project_matrix.copy()})
         select_prev_datas = np.random.choice(prev_datas['prev_data'][-self.prev_range:], self.prev_num, replace=False) # prev_num 1 从前5帧中随机抽一帧
         prev_images = [os.path.join(self.data_root, p['file_path']) for p in select_prev_datas] # select_prev_datas ndarray(1,) [prev_data{file_path,project_matrix,pose}]
         prev_poses = [p['project_matrix'].copy() for p in select_prev_datas] # prev_images list len=1 [prev_images_file_path] prev_poses list len=1 [ndarray(3,4)]
-        return prev_images, prev_poses
+        return prev_images, prev_poses # prev_images list len=1 [image path] prev_poses list len=1 [ndarray(3,4)] 为什么没有使用project_matrix
 
     def sample_prev_frame_test(self, prev_datas, cur_project_matrix, cur_filename):
         if len(prev_datas['prev_data']) < self.prev_num * self.prev_step:
@@ -116,7 +116,7 @@ class OpenlaneMFDataset(OpenlaneDataset):
         Returns:
             dict: Training/test data (with annotation if `test_mode` is set
                 False).
-        """
+        """ # {'filename': '/root/autodl-tmp/dataset/openlane/images/training/segment-11004685739714500220_2300_000_2320_000_with_camera_labels/155364027830692100.jpg', 'anno_file': '/root/autodl-tmp/dataset/openlane/cache_dense/training/segment-11004685739714500220_2300_000_2320_000_with_camera_labels/155364027830692100.pkl', 'prev_file': '/root/autodl-tmp/dataset/openlane/prev_data_release/training/segment-11004685739714500220_2300_000_2320_000_with_camera_labels/155364027830692100.pkl'}
         results = self.img_infos[idx].copy() # img_infos[138264]
         results['img_info'] = {} # {'filename': './data/OpenLane/images/training/segment-14818835630668820137_1780_000_1800_000_with_camera_labels/155848393712244900.jpg', 'anno_file': './data/OpenLane/cache_dense/training/segment-14818835630668820137_1780_000_1800_000_with_camera_labels/155848393712244900.pkl', 'prev_file': './data/OpenLane/prev_data_release/training/segment-14818835630668820137_1780_000_1800_000_with_camera_labels/155848393712244900.pkl'}
         results['img_info']['filename'] = results['filename']
