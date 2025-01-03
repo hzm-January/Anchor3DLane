@@ -4,7 +4,7 @@ anchor_len = len(anchor_y_steps)
 
 # dataset settings
 dataset_type = 'OpenlaneDataset'
-data_root = './data/OpenLane'
+data_root = '/root/autodl-tmp/dataset/lane_det_3d'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 input_size = (360, 480)
@@ -46,8 +46,9 @@ data = dict(
         type=dataset_type,
         data_root=data_root,
         y_steps=anchor_y_steps,
-        data_list='validation.txt',
-        dataset_config=dataset_config, 
+        # data_list='validation.txt',
+        data_list='all_data_validation_11839_2.txt',
+        dataset_config=dataset_config,
         test_mode=True,
         pipeline=test_pipeline))
 

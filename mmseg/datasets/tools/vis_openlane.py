@@ -412,9 +412,9 @@ class LaneVis(object):
 
     def visualize(self, pred_file, gt_file, test_file=None, prob_th=0.5, img_dir=None, save_dir=None, vis_step=20):
         mmcv.mkdir_or_exist(save_dir)
-        pred_lines = open(pred_file).readlines()
+        pred_lines = open(pred_file).readlines() # pred_file lane3d_prediction.json
         json_pred = [json.loads(line) for line in pred_lines]
-        json_gt = [json.loads(line) for line in open(gt_file).readlines()]
+        json_gt = [json.loads(line) for line in open(gt_file).readlines()] # gt_file data_splits/validation.json
         if test_file is not None:
             test_list = [s.strip().split('.')[0] for s in open(test_file, 'r').readlines()]
             json_pred = [s  for s in json_pred if s['file_path'][:-4] in test_list]
