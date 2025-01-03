@@ -33,7 +33,8 @@ dataset_config = dict(
 )
 
 data = dict(
-    samples_per_gpu=16,
+    # samples_per_gpu=16,
+    samples_per_gpu=1,
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,
@@ -46,8 +47,8 @@ data = dict(
         type=dataset_type,
         data_root=data_root,
         y_steps=anchor_y_steps,
-        # data_list='validation.txt',
-        data_list='all_data_validation_11839_2.txt',
+        data_list='validation.txt',
+        # data_list='all_data_validation_11839_2.txt',
         dataset_config=dataset_config, 
         test_mode=True,
         pipeline=test_pipeline))
@@ -76,7 +77,8 @@ dataset_config = dict(
 )
 
 data = dict(
-    samples_per_gpu=16,
+    # samples_per_gpu=16,
+    samples_per_gpu=1,
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,
@@ -89,8 +91,8 @@ data = dict(
         type=dataset_type,
         data_root=data_root,
         y_steps=anchor_y_steps,
-        # data_list='validation.txt',
-        data_list='all_data_validation_11839_2.txt',
+        data_list='validation.txt',
+        # data_list='all_data_validation_11839_2.txt',
         dataset_config=dataset_config, 
         test_mode=True,
         pipeline=test_pipeline))
@@ -98,20 +100,21 @@ data = dict(
 
 # model setting
 model = dict(
-    type = 'Anchor3DLaneDeform',
+    type = 'Anchor3DLane',
     backbone=dict(
         type='ResNetV1c',
-        depth=50,
+        depth=18,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         dilations=(1, 1, 2, 4),
         strides=(1, 2, 1, 1),
         with_cp=False,
         style='pytorch',
-        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
-        stage_with_dcn=(False, False, True, True),
+        # dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
+        # stage_with_dcn=(False, False, True, True),
     ),
-    pretrained = 'pretrained/resnet50_v1c-2cccc1ad.pth',
+    # pretrained = 'pretrained/resnet50_v1c-2cccc1ad.pth',
+    pretrained = 'pretrained/resnet18_v1c-2cccc1ad.pth',
     y_steps = anchor_y_steps,
     feat_y_steps = feat_y_steps,
     anchor_cfg = dict(pitches = [5, 2, 1, 0, -1, -2, -5],
@@ -135,7 +138,7 @@ model = dict(
     drop_out=0.,
     num_heads = 2,
     dim_feedforward = 128,
-    backbone_dim = 2048,
+    # backbone_dim = 2048,
     pre_norm = False,
     feat_size = (90, 120),
     num_category = 21,
